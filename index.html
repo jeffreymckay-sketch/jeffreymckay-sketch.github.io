@@ -36,6 +36,16 @@
             margin: 0;
             overflow: hidden;
         }
+        
+        .shake-body {
+            animation: body-shake 0.3s ease-in-out;
+        }
+        @keyframes body-shake {
+            25% { transform: translateX(5px); }
+            50% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
 
         /* --- UI STYLES --- */
         .game-ui {
@@ -81,13 +91,6 @@
             line-height: 1.5;
         }
        
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-
         #score-display.flash {
             animation: score-flash 0.5s ease;
         }
@@ -145,7 +148,6 @@
             0% { opacity: 0.7; }
             100% { opacity: 0; }
         }
-
 
         .progress-container {
             width: 100%;
@@ -254,7 +256,7 @@
             -webkit-user-select: none; user-select: none;
         }
 
-        .btn:active {
+        .btn:active, .btn.pushed {
             border-color: var(--dark-border) var(--light-border) var(--light-border) var(--dark-border);
         }
         
@@ -281,7 +283,30 @@
         .dsk-btn {
             width: 100%; padding: 10px; font-size: 1em;
         }
-        
+        .dsk-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
+
+        /* --- NEW GOAL REACHED OVERLAY --- */
+        #goal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10000;
+            flex-direction: column;
+        }
+        #goal-overlay.show {
+            display: flex;
+        }
+        #goal-text {
+            font-size: 1.5em;
+            line-height: 2;
+            color: var(--active-light);
+            text-shadow: 2px 2px var(--dark-border);
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -308,6 +333,10 @@
     </div>
 
     <div id="confetti-container"></div>
+    
+    <div id="goal-overlay">
+        <div id="goal-text"></div>
+    </div>
 
     <!-- Game UI -->
     <div class="game-ui">
@@ -399,6 +428,8 @@
         const confettiContainer = document.getElementById('confetti-container');
         const feedbackText = document.getElementById('feedback-text');
         const progressBar = document.getElementById('progress-bar');
+        const goalOverlay = document.getElementById('goal-overlay');
+        const goalText = document.getElementById('goal-text');
 
         // --- GAME STATE ---
         let score = 0;
@@ -413,6 +444,7 @@
         const activeKeys = new Set();
         const armedKeys = new Set();
         const successMessages = ["PERFECT!", "NICE SWITCH!", "GREAT!", "EXCELLENT!", "AWESOME!"];
+        let goalConfettiInterval = null;
         
         const customSounds = {
             correct: '',
@@ -471,6 +503,29 @@
         }
 
         // --- PIZZAZ FUNCTIONS ---
+        function triggerSuccessAnimation() {
+            playSound('correct');
+            triggerConfetti();
+            document.body.classList.add('shake-body');
+            document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.add('flash');
+
+            const randomSuccessMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
+            feedbackText.textContent = randomSuccessMessage;
+            feedbackText.classList.add('show');
+            
+            setTimeout(() => {
+                feedbackText.classList.remove('show');
+                document.body.classList.remove('shake-body');
+                document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.remove('flash');
+            }, 1200);
+        }
+
+        function triggerGoalReachedAnimation() {
+            goalText.innerHTML = `Well done! The professor was happy with the production!<br><br>Final Score: ${score}<br><br>Press DSK2 to start the next class.`;
+            goalOverlay.classList.add('show');
+            goalConfettiInterval = setInterval(triggerConfetti, 500);
+        }
+
         function triggerConfetti() {
             for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement('div');
@@ -514,10 +569,13 @@
             availablePrompts = [...gamePrompts];
             displayNewPrompt();
             gameStarted = true;
+            goalOverlay.classList.remove('show');
+            clearInterval(goalConfettiInterval);
         }
 
         function endGame() {
             gameStarted = false;
+            dsk2Button.classList.add('active');
             currentPrompt = null;
             promptText.textContent = `Round ended. Press DSK2 to start a new class.`;
         }
@@ -545,7 +603,7 @@
 
         function displayNewPrompt() {
              if (score >= GOAL_SCORE) {
-                promptText.textContent = "Well done! The professor was happy with the production! Press DSK2 to start the next class.";
+                triggerGoalReachedAnimation();
                 gameStarted = false;
                 dsk2Button.classList.add('active');
                 currentPrompt = null;
@@ -600,26 +658,18 @@
         }
 
         function handleCorrectAnswer() {
-             playSound('correct');
-             triggerConfetti();
-             document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.add('flash');
-
+             triggerSuccessAnimation();
+             
              const keyElements = Object.keys(currentPrompt.targetKeys).length;
              const pointsEarned = (1 + keyElements) * 150;
              score += pointsEarned;
              updateScoreboard();
 
-             const randomSuccessMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
-             feedbackText.textContent = randomSuccessMessage;
-             feedbackText.classList.add('show');
-             
              promptText.style.opacity = 0;
              currentPrompt = null; 
 
              setTimeout(() => {
-                feedbackText.classList.remove('show');
                 promptText.style.opacity = 1;
-                document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.remove('flash');
                 displayNewPrompt();
              }, 1200);
         }
@@ -714,7 +764,12 @@
         setupKeyerButtons();
         
         document.querySelectorAll('.btn').forEach(button => {
-             button.addEventListener('mousedown', () => playSound('click'));
+             button.addEventListener('mousedown', e => {
+                playSound('click');
+                e.currentTarget.classList.add('pushed');
+             });
+             button.addEventListener('mouseup', e => e.currentTarget.classList.remove('pushed'));
+             button.addEventListener('mouseleave', e => e.currentTarget.classList.remove('pushed'));
         });
 
         document.querySelectorAll('.key-buttons .btn:not(.on-btn):not(.keyer-btn):not(.background-btn), .key-bus .btn, #dsk1-btn').forEach(button => {
