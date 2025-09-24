@@ -260,7 +260,7 @@
             border-color: var(--dark-border) var(--light-border) var(--light-border) var(--dark-border);
         }
         
-        .key-bus .btn.active { background-color: var(--key-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
+        .key-bus .btn.active, .dsk-btn.active { background-color: var(--key-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
         .program-bus .btn.active, .on-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border);}
         .preview-bus .btn.active, .keyer-btn.active { background-color: var(--preview-color); color: var(--dark-border); }
         .background-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
@@ -285,12 +285,11 @@
         }
         .dsk-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
 
-        /* --- NEW GOAL REACHED OVERLAY --- */
         #goal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.8);
-            display: none; /* Hidden by default */
+            display: none;
             align-items: center;
             justify-content: center;
             text-align: center;
@@ -308,6 +307,25 @@
             text-shadow: 2px 2px var(--dark-border);
             padding: 20px;
         }
+
+        #success-popup {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: auto;
+            border: 4px solid var(--dark-border);
+            opacity: 0;
+            transform: scale(0.5) rotate(-15deg);
+            transition: all 0.3s ease-in-out;
+            pointer-events: none;
+            z-index: 10001;
+        }
+        #success-popup.show {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
     </style>
 </head>
 <body>
@@ -338,6 +356,8 @@
     <div id="goal-overlay">
         <div id="goal-text"></div>
     </div>
+    
+    <img id="success-popup" src="">
 
     <!-- Game UI -->
     <div class="game-ui">
@@ -431,10 +451,11 @@
         const progressBar = document.getElementById('progress-bar');
         const goalOverlay = document.getElementById('goal-overlay');
         const goalText = document.getElementById('goal-text');
+        const successPopup = document.getElementById('success-popup');
 
         // --- GAME STATE ---
         let score = 0;
-        const GOAL_SCORE = 2500;
+        const GOAL_SCORE = 1500;
         let currentPrompt = null;
         let gameStarted = false;
         let availablePrompts = [];
@@ -444,13 +465,18 @@
         };
         const activeKeys = new Set();
         const armedKeys = new Set();
-        const successMessages = ["PERFECT!", "NICE SWITCH!", "GREAT!", "EXCELLENT!", "AWESOME!"];
         let goalConfettiInterval = null;
+        let lastCorrectTimestamp = null;
+        const BASE_POINTS_PER_ELEMENT = 100;
+        const PENALTY_PER_SECOND = 4;
         
         const customSounds = {
             correct: '',
-            click: '', // Placeholder for custom click sound
+            click: '',
         };
+        
+        // --- NEW EMBEDDED SUCCESS IMAGE ---
+        const successImageUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gODAK/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoUDg8MEBcUGBgXFBYWGh0lHxobIxwWFiAsICMmJykqKRkfLTAtKDAlKCko/9sAQwEHBwcKCAoTCgoTKBoWGigoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgo/8AAEQgAlgDIAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AP38ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//Z';
 
         // --- COMBINED PROMPT DEFINITIONS ---
         const gamePrompts = [
@@ -490,28 +516,43 @@
         // --- AUDIO ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSound(type) {
-            if (type === 'click' && customSounds.click) { new Audio(customSounds.click).play(); return; }
-            if (type === 'correct' && customSounds.correct) { new Audio(customSounds.correct).play(); return; }
-             
              const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); gainNode.gain.setValueAtTime(0, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.01);
              if (type === 'correct') { oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(880.0, audioCtx.currentTime); }
-             else if (type === 'click') { oscillator.type = 'triangle'; oscillator.frequency.setValueAtTime(1500, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.01); }
+             else if (type === 'click') { oscillator.type = 'square'; oscillator.frequency.setValueAtTime(1200, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.01); }
              else { oscillator.type = 'square'; oscillator.frequency.setValueAtTime(110.0, audioCtx.currentTime); }
              oscillator.start(audioCtx.currentTime);
-             const duration = (type === 'click') ? 0.05 : 0.1;
+             const duration = (type === 'click') ? 0.03 : 0.1;
              gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
              oscillator.stop(audioCtx.currentTime + duration);
         }
 
+        function playVoiceFeedback(text) {
+            if (customSounds.correct) {
+                new Audio(customSounds.correct).play();
+                return;
+            }
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.pitch = 0.1; 
+                utterance.rate = 0.6; 
+                utterance.volume = 1;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                playSound('correct'); // Fallback
+            }
+        }
+
         // --- PIZZAZ FUNCTIONS ---
-        function triggerSuccessAnimation() {
-            playSound('correct');
+        function triggerSuccessAnimation(points, message) {
+            playVoiceFeedback(message);
             triggerConfetti();
             document.body.classList.add('shake-body');
             document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.add('flash');
+            
+            successPopup.src = successImageUrl;
+            successPopup.classList.add('show');
 
-            const randomSuccessMessage = successMessages[Math.floor(Math.random() * successMessages.length)];
-            feedbackText.textContent = randomSuccessMessage;
+            feedbackText.textContent = `${message} +${points}`;
             feedbackText.classList.add('show');
             
             setTimeout(() => {
@@ -519,6 +560,10 @@
                 document.body.classList.remove('shake-body');
                 document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.remove('flash');
             }, 1200);
+
+            setTimeout(() => {
+                successPopup.classList.remove('show');
+            }, 1500);
         }
 
         function triggerGoalReachedAnimation() {
@@ -573,6 +618,7 @@
             score = 0;
             updateScoreboard();
             availablePrompts = [...gamePrompts];
+            lastCorrectTimestamp = null;
             displayNewPrompt();
             gameStarted = true;
             goalOverlay.classList.remove('show');
@@ -664,13 +710,31 @@
         }
 
         function handleCorrectAnswer() {
-             triggerSuccessAnimation();
-             
+             const secondsPassed = lastCorrectTimestamp ? (Date.now() - lastCorrectTimestamp) / 1000 : 0;
+             const pointsPerElement = Math.max(0, BASE_POINTS_PER_ELEMENT - Math.floor(secondsPassed * PENALTY_PER_SECOND));
+
              const keyElements = Object.keys(currentPrompt.targetKeys).length;
-             const pointsEarned = (1 + keyElements) * 150;
+             const pointsEarned = (1 + keyElements) * pointsPerElement;
              score += pointsEarned;
              updateScoreboard();
 
+            let feedbackMessage = "";
+            if (pointsEarned === 0) {
+                feedbackMessage = "ouch";
+            } else if (secondsPassed < 5) {
+                feedbackMessage = "EXCELLENT!!";
+            } else if (secondsPassed <= 10) {
+                feedbackMessage = "GOOD";
+            } else if (secondsPassed <= 15) {
+                feedbackMessage = "LETS GO FASTER";
+            } else {
+                feedbackMessage = "WE GOT THERE";
+            }
+
+             triggerSuccessAnimation(pointsEarned, feedbackMessage);
+
+             lastCorrectTimestamp = Date.now();
+             
              promptText.style.opacity = 0;
              currentPrompt = null; 
 
