@@ -24,8 +24,11 @@
 
         body {
             background-color: var(--bg-dark);
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAABJJREFUCB1jZEAD/o/w/5OhvAMA/moC/wI2GcgAAAAASUVORK5CYII=');
-            image-rendering: pixelated;
+            /* NEW BACKGROUND IMAGE */
+            background-image: url('https://photos.smugmug.com/Randoimages/i-DV9FMRW/0/e2b31174/5K/Image-5K.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             color: var(--active-light);
             font-family: 'Press Start 2P', monospace;
             display: flex;
@@ -212,7 +215,7 @@
             justify-content: center; position: relative;
         }
         
-        .monitor-content > div { width: 100%; height: 100%; }
+        .monitor-content > div, .monitor-content > img { width: 100%; height: 100%; object-fit: contain; }
         .monitor-content svg {
             width: 100%; height: 100%; object-fit: contain;
             shape-rendering: crispEdges;
@@ -254,6 +257,7 @@
             font-family: 'Press Start 2P', monospace; cursor: pointer;
             flex-grow: 1; margin: 0 2px; text-align: center;
             -webkit-user-select: none; user-select: none;
+            line-height: 1.2;
         }
 
         .btn:active, .btn.pushed {
@@ -333,11 +337,11 @@
     <!-- Generated SVG Images -->
     <div id="image-sources" style="display: none;">
         <!-- Video Sources -->
-        <svg id="img-cam-1" viewBox="0 0 100 80" fill="none" stroke="#fff" stroke-width="3"><path d="M10 20 H60 V70 H10 Z M60 30 L85 15 V75 L60 60" stroke-linejoin="round"/><circle cx="35" cy="45" r="12" stroke-width="2"/><text x="45" y="30" font-size="12" fill="#fff" font-family="sans-serif">1</text></svg>
-        <svg id="img-cam-2" viewBox="0 0 100 80" fill="none" stroke="#fff" stroke-width="3"><path d="M10 20 H60 V70 H10 Z M60 30 L85 15 V75 L60 60" stroke-linejoin="round"/><circle cx="35" cy="45" r="12" stroke-width="2"/><text x="45" y="30" font-size="12" fill="#fff" font-family="sans-serif">2</text></svg>
-        <svg id="img-cam-3" viewBox="0 0 100 80" fill="none" stroke="#fff" stroke-width="3"><path d="M10 20 H60 V70 H10 Z M60 30 L85 15 V75 L60 60" stroke-linejoin="round"/><circle cx="35" cy="45" r="12" stroke-width="2"/><text x="45" y="30" font-size="12" fill="#fff" font-family="sans-serif">3</text></svg>
-        <svg id="img-class-pc" viewBox="0 0 100 80" fill="none" stroke="#fff" stroke-width="3"><rect x="10" y="10" width="80" height="55" rx="5"/><path d="M30 65 H70 L75 75 H25 Z"/><text x="50" y="45" font-size="24" fill="#fff" text-anchor="middle" font-family="sans-serif">A+</text></svg>
-        <svg id="img-control-pc" viewBox="0 0 100 80" fill="none" stroke="#fff" stroke-width="3"><rect x="10" y="10" width="80" height="55" rx="5"/><path d="M30 65 H70 L75 75 H25 Z"/><circle cx="50" cy="38" r="12" stroke-width="2"/><path d="M50 16 L50 24 M50 52 L50 60 M30 38 L38 38 M62 38 L70 38" stroke-width="4"/></svg>
+        <img id="img-cam-1" src="https://photos.smugmug.com/Randoimages/i-QJ8cF7b/0/3e7d5663/4K/Image-4K.jpg">
+        <img id="img-cam-2" src="https://photos.smugmug.com/Randoimages/i-4HkqZ6m/0/955403e0/4K/Image-4K.jpg">
+        <img id="img-cam-3" src="https://photos.smugmug.com/Randoimages/i-CzSc9SN/0/f65c5c04/4K/Image-4K.jpg">
+        <img id="img-class-pc" src="https://photos.smugmug.com/Randoimages/i-zGFBsRP/0/566219b2/4K/Image-4K.jpg">
+        <img id="img-control-pc" src="https://photos.smugmug.com/Randoimages/i-4LcVvH5/0/5d1f5e8f/4K/Image-4K.jpg">
         <svg id="img-mp-1" viewBox="0 0 100 80" fill="#fff"><path d="M40 30 L65 45 L40 60 Z"/><text x="70" y="52" font-size="12" fill="#fff" font-family="sans-serif">1</text></svg>
         <svg id="img-mp-2" viewBox="0 0 100 80" fill="#fff"><path d="M40 30 L65 45 L40 60 Z"/><text x="70" y="52" font-size="12" fill="#fff" font-family="sans-serif">2</text></svg>
         <div id="img-color" style="width: 100%; height: 100%; background-color: #2980b9;"></div>
@@ -403,19 +407,19 @@
             <div class="bus-row key-bus">
                 <div class="bus-label">Key Bus</div>
                 <div class="buttons">
-                    <button class="btn">CAM 1</button><button class="btn">CAM 2</button><button class="btn">CAM 3</button><button class="btn">CLASS PC</button><button class="btn">CONTROL PC</button><button class="btn">MEDIA PLAYER 1</button><button class="btn">MEDIA PLAYER 2</button><button class="btn">COLOR</button><button class="btn">BARS</button><button class="btn">BLACK</button>
+                    <button class="btn">CAM 1</button><button class="btn">CAM 2</button><button class="btn">DOCUMENT CAM</button><button class="btn">CLASS PC</button><button class="btn">CONTROL PC</button><button class="btn">MEDIA PLAYER 1</button><button class="btn">MEDIA PLAYER 2</button><button class="btn">COLOR</button><button class="btn">BARS</button><button class="btn">BLACK</button>
                 </div>
             </div>
             <div class="bus-row program-bus">
                 <div class="bus-label">Program Bus</div>
                 <div class="buttons">
-                    <button class="btn" data-source-id="img-cam-1">CAM 1</button><button class="btn" data-source-id="img-cam-2">CAM 2</button><button class="btn" data-source-id="img-cam-3">CAM 3</button><button class="btn" data-source-id="img-class-pc">CLASS PC</button><button class="btn" data-source-id="img-control-pc">CONTROL PC</button><button class="btn" data-source-id="img-mp-1">MEDIA PLAYER 1</button><button class="btn" data-source-id="img-mp-2">MEDIA PLAYER 2</button><button class="btn" data-source-id="img-color">COLOR</button><button class="btn" data-source-id="img-bars">BARS</button><button class="btn" data-source-id="img-black">BLACK</button>
+                    <button class="btn" data-source-id="img-cam-1">CAM 1</button><button class="btn" data-source-id="img-cam-2">CAM 2</button><button class="btn" data-source-id="img-cam-3">DOCUMENT CAM</button><button class="btn" data-source-id="img-class-pc">CLASS PC</button><button class="btn" data-source-id="img-control-pc">CONTROL PC</button><button class="btn" data-source-id="img-mp-1">MEDIA PLAYER 1</button><button class="btn" data-source-id="img-mp-2">MEDIA PLAYER 2</button><button class="btn" data-source-id="img-color">COLOR</button><button class="btn" data-source-id="img-bars">BARS</button><button class="btn" data-source-id="img-black">BLACK</button>
                 </div>
             </div>
              <div class="bus-row preview-bus">
                 <div class="bus-label">Preview Bus</div>
                 <div class="buttons">
-                    <button class="btn" data-source-id="img-cam-1">CAM 1</button><button class="btn" data-source-id="img-cam-2">CAM 2</button><button class="btn" data-source-id="img-cam-3">CAM 3</button><button class="btn" data-source-id="img-class-pc">CLASS PC</button><button class="btn" data-source-id="img-control-pc">CONTROL PC</button><button class="btn" data-source-id="img-mp-1">MEDIA PLAYER 1</button><button class="btn" data-source-id="img-mp-2">MEDIA PLAYER 2</button><button class="btn" data-source-id="img-color">COLOR</button><button class="btn" data-source-id="img-bars">BARS</button><button class="btn" data-source-id="img-black">BLACK</button>
+                    <button class="btn" data-source-id="img-cam-1">CAM 1</button><button class="btn" data-source-id="img-cam-2">CAM 2</button><button class="btn" data-source-id="img-cam-3">DOCUMENT CAM</button><button class="btn" data-source-id="img-class-pc">CLASS PC</button><button class="btn" data-source-id="img-control-pc">CONTROL PC</button><button class="btn" data-source-id="img-mp-1">MEDIA PLAYER 1</button><button class="btn" data-source-id="img-mp-2">MEDIA PLAYER 2</button><button class="btn" data-source-id="img-color">COLOR</button><button class="btn" data-source-id="img-bars">BARS</button><button class="btn" data-source-id="img-black">BLACK</button>
                 </div>
             </div>
         </div>
@@ -472,11 +476,11 @@
         
         const customSounds = {
             correct: '',
-            click: '',
+            // EXAMPLE: Using an external URL for a sound
+            click: 'https://www.myinstants.com/media/sounds/mouse-click-sound-effect-hd.mp3', 
         };
         
-        // --- NEW EMBEDDED SUCCESS IMAGE ---
-        const successImageUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gODAK/9sAQwAGBAUGBQQGBgUGBwcGCAoQCgoJCQoUDg8MEBcUGBgXFBYWGh0lHxobIxwWFiAsICMmJykqKRkfLTAtKDAlKCko/9sAQwEHBwcKCAoTCgoTKBoWGigoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgo/8AAEQgAlgDIAMBIgACEQEDEQH/xAAfAAABBQEBAQEBAQAAAAAAAAAAAQIDBAUGBwgJCgv/xAC1EAACAQMDAgQDBQUEBAAAAX0BAgMABBEFEiExQQYTUWEHInEUMoGRoQgjQrHBFVLR8CQzYnKCCQoWFxgZGiUmJygpKjQ1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4eLj5OXm5+jp6vHy8/T19vf4+fr/xAAfAQADAQEBAQEBAQEBAAAAAAAAAQIDBAUGBwgJCgv/xAC1EQACAQIEBAMEBwUEBAABAncAAQIDEQQFITEGEkFRB2FxEyIygQgUQpGhscEJIzNS8BVictEKFiQ04SXxFxgZGiYnKCkqNTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqCg4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2dri4+Tl5ufo6ery8/T19vf4+fr/2gAMAwEAAhEDEQA/AP38ooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//Z';
+        const successImageUrl = 'https://photos.smugmug.com/Randoimages/i-dfP4k8w/0/a6a66160/4K/Rando-4K.jpg';
 
         // --- COMBINED PROMPT DEFINITIONS ---
         const gamePrompts = [
@@ -491,25 +495,25 @@
             { text: "Put the Class PC up, and add the Sponsor logo (Key 4).", targetSource: "img-class-pc", targetKeys: { 4: 'on' } },
             { text: "I need Camera 1 with the Replay graphic (Key 3) and the Sponsor logo (Key 4).", targetSource: "img-cam-1", targetKeys: { 3: 'on', 4: 'on' } },
             { text: "Let's see Camera 2 with the lower third (Key 1) and the LIVE bug (Key 2).", targetSource: "img-cam-2", targetKeys: { 1: 'on', 2: 'on' } },
-            { text: "Show me Camera 3, clean.", targetSource: "img-cam-3", targetKeys: {} },
+            { text: "Show me the Document Cam, clean.", targetSource: "img-cam-3", targetKeys: {} },
             { text: "Put up the color bars.", targetSource: "img-bars", targetKeys: {} },
             { text: "Let's see that solid blue color source.", targetSource: "img-color", targetKeys: {} },
-            { text: "Give me Camera 3 with the LIVE bug (Key 2).", targetSource: "img-cam-3", targetKeys: { 2: 'on' } },
+            { text: "Give me the Document Cam with the LIVE bug (Key 2).", targetSource: "img-cam-3", targetKeys: { 2: 'on' } },
             { text: "I need the Control PC with the Sponsor logo (Key 4).", targetSource: "img-control-pc", targetKeys: { 4: 'on' } },
             { text: "Show the Class PC with the Replay graphic (Key 3).", targetSource: "img-class-pc", targetKeys: { 3: 'on' } },
             { text: "I want Camera 2 with just the lower third (Key 1).", targetSource: "img-cam-2", targetKeys: { 1: 'on' } },
             { text: "Give me Media Player 1 with the LIVE bug (Key 2).", targetSource: "img-mp-1", targetKeys: { 2: 'on' } },
             { text: "Show Camera 1, but lose all graphics.", targetSource: "img-cam-1", targetKeys: {} },
             { text: "Let's see the Class PC feed, clean.", targetSource: "img-class-pc", targetKeys: {} },
-            { text: "I need Camera 3 with the host's lower third (Key 1).", targetSource: "img-cam-3", targetKeys: { 1: 'on' } },
+            { text: "I need the Document Cam with the host's lower third (Key 1).", targetSource: "img-cam-3", targetKeys: { 1: 'on' } },
             { text: "Put up the Control PC with the Replay graphic (Key 3).", targetSource: "img-control-pc", targetKeys: { 3: 'on' } },
             { text: "Show Media Player 2 with the Sponsor logo (Key 4).", targetSource: "img-mp-2", targetKeys: { 4: 'on' } },
-            { text: "I want Camera 3 with both the lower third (Key 1) and the LIVE bug (Key 2).", targetSource: "img-cam-3", targetKeys: { 1: 'on', 2: 'on' } },
+            { text: "I want the Document Cam with both the lower third (Key 1) and the LIVE bug (Key 2).", targetSource: "img-cam-3", targetKeys: { 1: 'on', 2: 'on' } },
             { text: "Give me the Control PC feed with the Replay (Key 3) and Sponsor (Key 4) graphics.", targetSource: "img-control-pc", targetKeys: { 3: 'on', 4: 'on' } },
             { text: "Show me Camera 1 with just the LIVE bug (Key 2).", targetSource: "img-cam-1", targetKeys: { 2: 'on' } },
             { text: "I need Camera 2 with the Replay graphic (Key 3).", targetSource: "img-cam-2", targetKeys: { 3: 'on' } },
             { text: "Put up Media Player 2, clean.", targetSource: "img-mp-2", targetKeys: {} },
-            { text: "Let's see Camera 3 with the Sponsor logo (Key 4).", targetSource: "img-cam-3", targetKeys: { 4: 'on' } },
+            { text: "Let's see the Document Cam with the Sponsor logo (Key 4).", targetSource: "img-cam-3", targetKeys: { 4: 'on' } },
             { text: "Show me the Class PC with both the lower third (Key 1) and Sponsor logo (Key 4).", targetSource: "img-class-pc", targetKeys: { 1: 'on', 4: 'on' } }
         ];
 
