@@ -259,17 +259,14 @@
         }
         
         .key-bus .btn.active { background-color: var(--key-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
-        .program-bus .btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border);}
+        .program-bus .btn.active, .on-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border);}
         .preview-bus .btn.active, .keyer-btn.active { background-color: var(--preview-color); color: var(--dark-border); }
+        .background-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
 
         .side-controls { display: flex; flex-direction: column; }
         .key-buttons { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 10px; }
         .side-controls .btn.active { background-color: var(--light-border); color: var(--dark-border); }
-        .side-controls .on-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
-        .side-controls .background-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
-        .side-controls .dsk-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
-
-
+        
         .transition-controls { display: flex; justify-content: space-around; margin-top: auto; }
         .momentary-btn { padding: 15px 10px; font-size: 14px; }
         .cut-btn { background-color: var(--program-color); }
@@ -434,7 +431,27 @@
             { text: "Show me Camera 2 with the LIVE bug (Key 2).", targetSource: "img-cam-2", targetKeys: { 2: 'on' } },
             { text: "Put the Class PC up, and add the Sponsor logo (Key 4).", targetSource: "img-class-pc", targetKeys: { 4: 'on' } },
             { text: "I need Camera 1 with the Replay graphic (Key 3) and the Sponsor logo (Key 4).", targetSource: "img-cam-1", targetKeys: { 3: 'on', 4: 'on' } },
-            { text: "Let's see Camera 2 with the lower third (Key 1) and the LIVE bug (Key 2).", targetSource: "img-cam-2", targetKeys: { 1: 'on', 2: 'on' } }
+            { text: "Let's see Camera 2 with the lower third (Key 1) and the LIVE bug (Key 2).", targetSource: "img-cam-2", targetKeys: { 1: 'on', 2: 'on' } },
+            { text: "Show me Camera 3, clean.", targetSource: "img-cam-3", targetKeys: {} },
+            { text: "Put up the color bars.", targetSource: "img-bars", targetKeys: {} },
+            { text: "Let's see that solid blue color source.", targetSource: "img-color", targetKeys: {} },
+            { text: "Give me Camera 3 with the LIVE bug (Key 2).", targetSource: "img-cam-3", targetKeys: { 2: 'on' } },
+            { text: "I need the Control PC with the Sponsor logo (Key 4).", targetSource: "img-control-pc", targetKeys: { 4: 'on' } },
+            { text: "Show the Class PC with the Replay graphic (Key 3).", targetSource: "img-class-pc", targetKeys: { 3: 'on' } },
+            { text: "I want Camera 2 with just the lower third (Key 1).", targetSource: "img-cam-2", targetKeys: { 1: 'on' } },
+            { text: "Give me Media Player 1 with the LIVE bug (Key 2).", targetSource: "img-mp-1", targetKeys: { 2: 'on' } },
+            { text: "Show Camera 1, but lose all graphics.", targetSource: "img-cam-1", targetKeys: {} },
+            { text: "Let's see the Class PC feed, clean.", targetSource: "img-class-pc", targetKeys: {} },
+            { text: "I need Camera 3 with the host's lower third (Key 1).", targetSource: "img-cam-3", targetKeys: { 1: 'on' } },
+            { text: "Put up the Control PC with the Replay graphic (Key 3).", targetSource: "img-control-pc", targetKeys: { 3: 'on' } },
+            { text: "Show Media Player 2 with the Sponsor logo (Key 4).", targetSource: "img-mp-2", targetKeys: { 4: 'on' } },
+            { text: "I want Camera 3 with both the lower third (Key 1) and the LIVE bug (Key 2).", targetSource: "img-cam-3", targetKeys: { 1: 'on', 2: 'on' } },
+            { text: "Give me the Control PC feed with the Replay (Key 3) and Sponsor (Key 4) graphics.", targetSource: "img-control-pc", targetKeys: { 3: 'on', 4: 'on' } },
+            { text: "Show me Camera 1 with just the LIVE bug (Key 2).", targetSource: "img-cam-1", targetKeys: { 2: 'on' } },
+            { text: "I need Camera 2 with the Replay graphic (Key 3).", targetSource: "img-cam-2", targetKeys: { 3: 'on' } },
+            { text: "Put up Media Player 2, clean.", targetSource: "img-mp-2", targetKeys: {} },
+            { text: "Let's see Camera 3 with the Sponsor logo (Key 4).", targetSource: "img-cam-3", targetKeys: { 4: 'on' } },
+            { text: "Show me the Class PC with both the lower third (Key 1) and Sponsor logo (Key 4).", targetSource: "img-class-pc", targetKeys: { 1: 'on', 4: 'on' } }
         ];
 
         // --- AUDIO ---
