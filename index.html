@@ -296,6 +296,7 @@
             text-align: center;
             z-index: 10000;
             flex-direction: column;
+            cursor: pointer;
         }
         #goal-overlay.show {
             display: flex;
@@ -521,9 +522,14 @@
         }
 
         function triggerGoalReachedAnimation() {
-            goalText.innerHTML = `Well done! The professor was happy with the production!<br><br>Final Score: ${score}<br><br>Press DSK2 to start the next class.`;
+            goalText.innerHTML = `Well done! The professor was happy with the production!<br><br>Final Score: ${score}<br><br>Click anywhere to continue.`;
             goalOverlay.classList.add('show');
             goalConfettiInterval = setInterval(triggerConfetti, 500);
+        }
+
+        function hideGoalOverlay() {
+            goalOverlay.classList.remove('show');
+            clearInterval(goalConfettiInterval);
         }
 
         function triggerConfetti() {
@@ -789,6 +795,8 @@
                 startGame();
             }
         });
+
+        goalOverlay.addEventListener('click', hideGoalOverlay);
 
         function setInitialState() {
             gameStarted = false; 
