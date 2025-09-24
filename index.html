@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATEM 1 M/E Trainer - SNES Edition</title>
+    <title>ATEM ATTACK!</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -24,8 +24,7 @@
 
         body {
             background-color: var(--bg-dark);
-            /* NEW BACKGROUND IMAGE */
-            background-image: url('https://photos.smugmug.com/Randoimages/i-DV9FMRW/0/e2b31174/5K/Image-5K.jpg');
+            background-image: url('https://photos.smugmug.com/Randoimages/i-LtrCcHL/0/546f0431/5K/Rando-5K.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -48,6 +47,44 @@
             50% { transform: translateX(-5px); }
             75% { transform: translateX(5px); }
             100% { transform: translateX(0); }
+        }
+
+        /* --- NEW BANNER STYLES --- */
+        .arcade-banner {
+            width: 82%;
+            background-color: #000;
+            border: 4px solid var(--dark-border);
+            border-bottom: none;
+            padding: 10px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            border-image: linear-gradient(45deg, var(--key-color), var(--program-color), var(--preview-color)) 1;
+            border-image-slice: 1;
+            border-width: 8px;
+        }
+
+        .banner-title {
+            font-size: 2em;
+            color: var(--active-light);
+            text-shadow: 4px 4px 0 var(--program-color), 
+                         -4px -4px 0 var(--key-color);
+            animation: flicker 1.5s infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                text-shadow:
+                4px 4px 0 var(--program-color),
+                -4px -4px 0 var(--key-color),
+                0 0 10px #fff,
+                0 0 20px #fff,
+                0 0 30px var(--preview-color),
+                0 0 40px var(--preview-color);
+            }
+            20%, 24%, 55% {        
+                text-shadow: none;
+            }
         }
 
         /* --- UI STYLES --- */
@@ -184,7 +221,7 @@
             display: flex;
             justify-content: center;
             width: 80%;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .monitor {
@@ -215,9 +252,15 @@
             justify-content: center; position: relative;
         }
         
-        .monitor-content > div, .monitor-content > img { width: 100%; height: 100%; object-fit: contain; }
+        .monitor-content > div, 
+        .monitor-content img, 
+        .monitor-content svg { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+        }
+
         .monitor-content svg {
-            width: 100%; height: 100%; object-fit: contain;
             shape-rendering: crispEdges;
         }
         
@@ -264,8 +307,8 @@
             border-color: var(--dark-border) var(--light-border) var(--light-border) var(--dark-border);
         }
         
-        .key-bus .btn.active, .dsk-btn.active { background-color: var(--key-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
-        .program-bus .btn.active, .on-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border);}
+        .key-bus .btn.active, .dsk-btn:not(.active) { background-color: var(--key-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
+        .program-bus .btn.active, .on-btn.active, .dsk-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border);}
         .preview-bus .btn.active, .keyer-btn.active { background-color: var(--preview-color); color: var(--dark-border); }
         .background-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
 
@@ -287,8 +330,7 @@
         .dsk-btn {
             width: 100%; padding: 10px; font-size: 1em;
         }
-        .dsk-btn.active { background-color: var(--program-color); color: var(--active-light); text-shadow: 1px 1px var(--dark-border); }
-
+        
         #goal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -300,6 +342,7 @@
             z-index: 10000;
             flex-direction: column;
             cursor: pointer;
+            overflow: hidden;
         }
         #goal-overlay.show {
             display: flex;
@@ -310,6 +353,7 @@
             color: var(--active-light);
             text-shadow: 2px 2px var(--dark-border);
             padding: 20px;
+            z-index: 10002;
         }
 
         #success-popup {
@@ -329,6 +373,40 @@
             opacity: 1;
             transform: scale(1) rotate(0deg);
         }
+        
+        #dsk2-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10; 
+        }
+        #dsk2-overlay.show {
+            display: flex;
+        }
+        #dsk2-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #bouncing-logo {
+            position: absolute;
+            width: 150px;
+            height: auto;
+            z-index: 10001;
+            animation: bounce 10s linear infinite;
+        }
+
+        @keyframes bounce {
+            0% { top: 0; left: 0; }
+            25% { top: 0; left: calc(100% - 150px); }
+            50% { top: calc(100% - 150px); left: calc(100% - 150px); }
+            75% { top: calc(100% - 150px); left: 0; }
+            100% { top: 0; left: 0; }
+        }
 
     </style>
 </head>
@@ -342,8 +420,8 @@
         <img id="img-cam-3" src="https://photos.smugmug.com/Randoimages/i-CzSc9SN/0/f65c5c04/4K/Image-4K.jpg">
         <img id="img-class-pc" src="https://photos.smugmug.com/Randoimages/i-zGFBsRP/0/566219b2/4K/Image-4K.jpg">
         <img id="img-control-pc" src="https://photos.smugmug.com/Randoimages/i-4LcVvH5/0/5d1f5e8f/4K/Image-4K.jpg">
-        <svg id="img-mp-1" viewBox="0 0 100 80" fill="#fff"><path d="M40 30 L65 45 L40 60 Z"/><text x="70" y="52" font-size="12" fill="#fff" font-family="sans-serif">1</text></svg>
-        <svg id="img-mp-2" viewBox="0 0 100 80" fill="#fff"><path d="M40 30 L65 45 L40 60 Z"/><text x="70" y="52" font-size="12" fill="#fff" font-family="sans-serif">2</text></svg>
+        <img id="img-mp-1" src="https://photos.smugmug.com/Maine/i-3cSdpPf/0/a9b8823b/5K/September-Morning--5K.jpg">
+        <img id="img-mp-2" src="https://photos.smugmug.com/Randoimages/i-vxVcVtx/0/1881b244/4K/Image-4K.jpg">
         <div id="img-color" style="width: 100%; height: 100%; background-color: #2980b9;"></div>
         <svg id="img-bars" viewBox="0 0 7 6"><rect fill="#C0C0C0" width="1" height="4"/><rect fill="#C0C000" x="1" width="1" height="4"/><rect fill="#00C0C0" x="2" width="1" height="4"/><rect fill="#00C000" x="3" width="1" height="4"/><rect fill="#C000C0" x="4" width="1" height="4"/><rect fill="#C00000" x="5" width="1" height="4"/><rect fill="#0000C0" x="6" width="1" height="4"/><rect fill="#0000C0" y="4" width="1" height="2"/><rect fill="#000000" x="1" y="4" width="1" height="2"/><rect fill="#C000C0" x="2" y="4" width="1" height="2"/><rect fill="#000000" x="3" y="4" width="1" height="2"/><rect fill="#00C0C0" x="4" y="4" width="1" height="2"/><rect fill="#000000" x="5" y="4" width="1" height="2"/><rect fill="#C0C0C0" x="6" y="4" width="1" height="2"/></svg>
         <div id="img-black" style="width: 100%; height: 100%; background-color: #000;"></div>
@@ -358,10 +436,16 @@
     <div id="confetti-container"></div>
     
     <div id="goal-overlay">
+        <img id="bouncing-logo" src="https://photos.smugmug.com/Randoimages/i-dfP4k8w/0/a6a66160/4K/Rando-4K.jpg">
         <div id="goal-text"></div>
     </div>
     
     <img id="success-popup" src="">
+
+    <!-- NEW Banner -->
+    <div class="arcade-banner">
+        <h1 class="banner-title">ATEM ATTACK!</h1>
+    </div>
 
     <!-- Game UI -->
     <div class="game-ui">
@@ -398,6 +482,7 @@
                 <div id="key-3-container" class="key-overlay"></div>
                 <div id="key-4-container" class="key-overlay"></div>
                 <div class="monitor-flash"></div>
+                <div id="dsk2-overlay"><img src="https://photos.smugmug.com/Randoimages/i-vxVcVtx/0/1881b244/4K/Image-4K.jpg"></div>
             </div>
         </div>
     </div>
@@ -456,12 +541,14 @@
         const goalOverlay = document.getElementById('goal-overlay');
         const goalText = document.getElementById('goal-text');
         const successPopup = document.getElementById('success-popup');
+        const dsk2Overlay = document.getElementById('dsk2-overlay');
 
         // --- GAME STATE ---
         let score = 0;
         const GOAL_SCORE = 1500;
         let currentPrompt = null;
         let gameStarted = false;
+        let goalReached = false;
         let availablePrompts = [];
         const keyerGraphics = {
             1: 'key-graphic-1', 2: 'key-graphic-2',
@@ -476,11 +563,11 @@
         
         const customSounds = {
             correct: '',
-            // EXAMPLE: Using an external URL for a sound
             click: 'https://www.myinstants.com/media/sounds/mouse-click-sound-effect-hd.mp3', 
         };
         
         const successImageUrl = 'https://photos.smugmug.com/Randoimages/i-dfP4k8w/0/a6a66160/4K/Rando-4K.jpg';
+        const ouchImageUrl = 'https://photos.smugmug.com/Randoimages/i-fFwCn2T/0/7d4e414c/4K/Rando-4K.jpg';
 
         // --- COMBINED PROMPT DEFINITIONS ---
         const gamePrompts = [
@@ -553,7 +640,11 @@
             document.body.classList.add('shake-body');
             document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.add('flash');
             
-            successPopup.src = successImageUrl;
+            if (points === 0) {
+                successPopup.src = ouchImageUrl;
+            } else {
+                successPopup.src = successImageUrl;
+            }
             successPopup.classList.add('show');
 
             feedbackText.textContent = `${message} +${points}`;
@@ -625,13 +716,16 @@
             lastCorrectTimestamp = null;
             displayNewPrompt();
             gameStarted = true;
+            goalReached = false;
             goalOverlay.classList.remove('show');
             clearInterval(goalConfettiInterval);
+            dsk2Overlay.classList.remove('show');
         }
 
         function endGame() {
             gameStarted = false;
             dsk2Button.classList.add('active');
+            dsk2Overlay.classList.add('show');
             currentPrompt = null;
             promptText.textContent = `Round ended. Press DSK2 to start a new class.`;
         }
@@ -658,11 +752,12 @@
         }
 
         function displayNewPrompt() {
-             if (score >= GOAL_SCORE) {
-                triggerGoalReachedAnimation();
+             if (score >= GOAL_SCORE && !goalReached) {
+                goalReached = true;
                 gameStarted = false;
                 dsk2Button.classList.add('active');
                 currentPrompt = null;
+                promptText.textContent = "Goal reached! Press DSK2 to end the production.";
                 return;
             }
 
@@ -670,6 +765,7 @@
                  promptText.textContent = `Training Complete! Final Score: ${score}. Press DSK2 to play again.`;
                  gameStarted = false;
                  dsk2Button.classList.add('active');
+                 dsk2Overlay.classList.add('show');
                  currentPrompt = null;
                  return;
             }
@@ -680,6 +776,7 @@
                 promptText.textContent = `All tasks complete! Final Score: ${score}. Press DSK2 to play again.`;
                  gameStarted = false;
                  dsk2Button.classList.add('active');
+                 dsk2Overlay.classList.add('show');
                  currentPrompt = null;
                 return;
             }
@@ -856,6 +953,13 @@
         autoButton.addEventListener('click', performTransition);
         
         dsk2Button.addEventListener('click', () => {
+            if (goalReached) {
+                triggerGoalReachedAnimation();
+                goalReached = false;
+                dsk2Button.classList.add('active'); // Keep it active for restart
+                dsk2Overlay.classList.add('show');
+                return;
+            }
             dsk2Button.classList.toggle('active');
             if(gameStarted) {
                 endGame();
@@ -868,10 +972,12 @@
 
         function setInitialState() {
             gameStarted = false; 
+            goalReached = false;
             document.querySelector('.program-bus .btn[data-source-id="img-black"]')?.dispatchEvent(new MouseEvent('click'));
             document.querySelector('.preview-bus .btn[data-source-id="img-cam-1"]')?.dispatchEvent(new MouseEvent('click'));
             document.querySelector('.background-btn').classList.add('active');
             dsk2Button.classList.add('active');
+            dsk2Overlay.classList.add('show');
             gameStarted = false; 
             promptText.textContent = "Press DSK2 to begin your training!";
             updateScoreboard();
