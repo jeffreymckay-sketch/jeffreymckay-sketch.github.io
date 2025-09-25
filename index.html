@@ -562,10 +562,18 @@
         const PENALTY_PER_SECOND = 4;
         
         const customSounds = {
-            correct: '',
-            click: 'https://www.myinstants.com/media/sounds/mouse-click-sound-effect-hd.mp3', 
+            click: 'https://www.dropbox.com/scl/fi/fh4wfn3fioh076m6850br/keyboard-spacebar-hit-101812.mp3?rlkey=fmfy8mf6qux9xav68x24amji8&st=mnigpmw9&dl=1',
+            'EXCELLENT!!': 'https://www.dropbox.com/scl/fi/b6d8c5krax8jbalfouj30/excellent-crushed.wav?rlkey=mwig16wqqzcrit4hrpl9zdear&st=yxfqaxe7&dl=1',
+            'GOOD': 'https://www.dropbox.com/scl/fi/thwkjtypl7fmahqxc63fl/good-crushed.wav?rlkey=l5kely28rhpb5lpvytt8a6l5g&st=wmm1bw1d&dl=1',
+            'ouch': 'https://www.dropbox.com/scl/fi/hn7ckopuphbmb38nqvo79/ouch-crushed.wav?rlkey=cbf92j3u1l4z7em0xql3z6ahd&st=c0dendbm&dl=1',
+            'LETS GO FASTER': 'https://www.dropbox.com/scl/fi/v7bsclku8hccphbs302v0/faster-crushed.wav?rlkey=ebncw3atb5gk7p4gjy2vm31at&st=dgf9zct9&dl=1',
+            'WE GOT THERE': 'https://www.dropbox.com/scl/fi/qq0d659fxmbm354wi38mv/we-got-there-crushed.wav?rlkey=elga0ajsdf5mc91dbd5skv74x&st=qiqb50qy&dl=1'
         };
         
+        const backgroundMusicUrl = 'https://www.dropbox.com/scl/fi/diitknfi65mbqaetd3swa/retro-wave-style-track-59892.mp3?rlkey=aivpkycc9ct6s3thsic21r7nj&st=hqofb7gi&dl=1';
+        let backgroundMusic = null;
+        let preloadedSounds = {};
+
         const successImageUrl = 'https://photos.smugmug.com/Randoimages/i-dfP4k8w/0/a6a66160/4K/Rando-4K.jpg';
         const ouchImageUrl = 'https://photos.smugmug.com/Randoimages/i-fFwCn2T/0/7d4e414c/4K/Rando-4K.jpg';
 
@@ -605,37 +613,29 @@
         ];
 
         // --- AUDIO ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
-             const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); gainNode.gain.setValueAtTime(0, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.01);
-             if (type === 'correct') { oscillator.type = 'sine'; oscillator.frequency.setValueAtTime(880.0, audioCtx.currentTime); }
-             else if (type === 'click') { oscillator.type = 'square'; oscillator.frequency.setValueAtTime(1200, audioCtx.currentTime); gainNode.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 0.01); }
-             else { oscillator.type = 'square'; oscillator.frequency.setValueAtTime(110.0, audioCtx.currentTime); }
-             oscillator.start(audioCtx.currentTime);
-             const duration = (type === 'click') ? 0.03 : 0.1;
-             gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
-             oscillator.stop(audioCtx.currentTime + duration);
+        function preloadAudio() {
+            for (const key in customSounds) {
+                if(customSounds[key]) {
+                    preloadedSounds[key] = new Audio(customSounds[key]);
+                    preloadedSounds[key].preload = 'auto';
+                }
+            }
+            backgroundMusic = new Audio(backgroundMusicUrl);
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.2;
+            backgroundMusic.preload = 'auto';
         }
 
-        function playVoiceFeedback(text) {
-            if (customSounds.correct) {
-                new Audio(customSounds.correct).play();
-                return;
-            }
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.pitch = 0.1; 
-                utterance.rate = 0.6; 
-                utterance.volume = 1;
-                window.speechSynthesis.speak(utterance);
-            } else {
-                playSound('correct'); // Fallback
+        function playSound(type) {
+            if (preloadedSounds[type]) {
+                preloadedSounds[type].currentTime = 0;
+                preloadedSounds[type].play();
             }
         }
 
         // --- PIZZAZ FUNCTIONS ---
         function triggerSuccessAnimation(points, message) {
-            playVoiceFeedback(message);
+            playSound(message);
             triggerConfetti();
             document.body.classList.add('shake-body');
             document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.add('flash');
@@ -713,13 +713,15 @@
             score = 0;
             updateScoreboard();
             availablePrompts = [...gamePrompts];
-            lastCorrectTimestamp = null;
+            lastCorrectTimestamp = Date.now();
             displayNewPrompt();
             gameStarted = true;
             goalReached = false;
             goalOverlay.classList.remove('show');
             clearInterval(goalConfettiInterval);
             dsk2Overlay.classList.remove('show');
+            
+            backgroundMusic.play().catch(e => console.log("Audio play failed, user interaction needed."));
         }
 
         function endGame() {
@@ -728,6 +730,10 @@
             dsk2Overlay.classList.add('show');
             currentPrompt = null;
             promptText.textContent = `Round ended. Press DSK2 to start a new class.`;
+            if(backgroundMusic) {
+                backgroundMusic.pause();
+                backgroundMusic.currentTime = 0;
+            }
         }
 
         function updateScoreboard() { 
@@ -758,6 +764,7 @@
                 dsk2Button.classList.add('active');
                 currentPrompt = null;
                 promptText.textContent = "Goal reached! Press DSK2 to end the production.";
+                if(backgroundMusic) backgroundMusic.pause();
                 return;
             }
 
@@ -767,6 +774,7 @@
                  dsk2Button.classList.add('active');
                  dsk2Overlay.classList.add('show');
                  currentPrompt = null;
+                 if(backgroundMusic) backgroundMusic.pause();
                  return;
             }
 
@@ -778,6 +786,7 @@
                  dsk2Button.classList.add('active');
                  dsk2Overlay.classList.add('show');
                  currentPrompt = null;
+                 if(backgroundMusic) backgroundMusic.pause();
                 return;
             }
             
@@ -815,12 +824,12 @@
              const pointsPerElement = Math.max(0, BASE_POINTS_PER_ELEMENT - Math.floor(secondsPassed * PENALTY_PER_SECOND));
 
              const keyElements = Object.keys(currentPrompt.targetKeys).length;
-             const pointsEarned = (1 + keyElements) * pointsPerElement;
+             const pointsEarned = Math.round((1 + keyElements) * pointsPerElement);
              score += pointsEarned;
              updateScoreboard();
 
             let feedbackMessage = "";
-            if (pointsEarned === 0) {
+            if (pointsEarned <= 0) {
                 feedbackMessage = "ouch";
             } else if (secondsPassed < 5) {
                 feedbackMessage = "EXCELLENT!!";
@@ -929,6 +938,7 @@
         }
 
         // --- INITIALIZATION ---
+        preloadAudio();
         setupExclusiveBusRow('.program-bus', programSourceContainer);
         setupExclusiveBusRow('.preview-bus', previewSourceContainer);
         setupKeyOnButtons();
@@ -956,8 +966,6 @@
             if (goalReached) {
                 triggerGoalReachedAnimation();
                 goalReached = false;
-                dsk2Button.classList.add('active'); // Keep it active for restart
-                dsk2Overlay.classList.add('show');
                 return;
             }
             dsk2Button.classList.toggle('active');
