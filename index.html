@@ -120,6 +120,8 @@
             justify-content: center;
             text-align: center;
             border: 2px solid var(--dark-border);
+            position: relative;
+            overflow: hidden;
         }
         #prompt-text {
             margin: 0;
@@ -131,6 +133,15 @@
             line-height: 1.5;
         }
        
+        #prompt-timer-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 5px;
+            background-color: var(--timer-color);
+            width: 100%;
+        }
+
         #score-display.flash {
             animation: score-flash 0.5s ease;
         }
@@ -455,6 +466,7 @@
         </div>
         <div class="prompt-box" id="prompt-box">
             <p id="prompt-text">Press DSK2 to begin!</p>
+            <div id="prompt-timer-bar"></div>
         </div>
         <div class="progress-container">
             <div class="progress-label">Live in 3,2,1...</div>
@@ -542,6 +554,7 @@
         const goalText = document.getElementById('goal-text');
         const successPopup = document.getElementById('success-popup');
         const dsk2Overlay = document.getElementById('dsk2-overlay');
+        const promptTimerBar = document.getElementById('prompt-timer-bar');
 
         // --- GAME STATE ---
         let score = 0;
@@ -560,6 +573,8 @@
         let lastCorrectTimestamp = null;
         const BASE_POINTS_PER_ELEMENT = 100;
         const PENALTY_PER_SECOND = 4;
+        const TIMER_DURATION = BASE_POINTS_PER_ELEMENT / PENALTY_PER_SECOND; // 25 seconds
+        let promptTimerInterval = null;
         
         const customSounds = {
             click: 'https://www.dropbox.com/scl/fi/fh4wfn3fioh076m6850br/keyboard-spacebar-hit-101812.mp3?rlkey=fmfy8mf6qux9xav68x24amji8&st=mnigpmw9&dl=1',
@@ -567,7 +582,9 @@
             'GOOD': 'https://www.dropbox.com/scl/fi/thwkjtypl7fmahqxc63fl/good-crushed.wav?rlkey=l5kely28rhpb5lpvytt8a6l5g&st=wmm1bw1d&dl=1',
             'ouch': 'https://www.dropbox.com/scl/fi/hn7ckopuphbmb38nqvo79/ouch-crushed.wav?rlkey=cbf92j3u1l4z7em0xql3z6ahd&st=c0dendbm&dl=1',
             'LETS GO FASTER': 'https://www.dropbox.com/scl/fi/v7bsclku8hccphbs302v0/faster-crushed.wav?rlkey=ebncw3atb5gk7p4gjy2vm31at&st=dgf9zct9&dl=1',
-            'WE GOT THERE': 'https://www.dropbox.com/scl/fi/qq0d659fxmbm354wi38mv/we-got-there-crushed.wav?rlkey=elga0ajsdf5mc91dbd5skv74x&st=qiqb50qy&dl=1'
+            'WE GOT THERE': 'https://www.dropbox.com/scl/fi/qq0d659fxmbm354wi38mv/we-got-there-crushed.wav?rlkey=elga0ajsdf5mc91dbd5skv74x&st=qiqb50qy&dl=1',
+            victoryMusic: 'https://www.dropbox.com/scl/fi/f32urlmp2l2kdz1klfhgp/success-1-6297.mp3?rlkey=yigctpzx727bcnqaux5h80spp&st=gf05r49q&dl=1',
+            applause: 'https://www.dropbox.com/scl/fi/62ga5yxm8i4ydewmvgwth/clapping_mixdown.wav?rlkey=rsgf6s2cnyddzxcan9a4cdnx4&st=2nyp366h&dl=1'
         };
         
         const backgroundMusicUrl = 'https://www.dropbox.com/scl/fi/diitknfi65mbqaetd3swa/retro-wave-style-track-59892.mp3?rlkey=aivpkycc9ct6s3thsic21r7nj&st=hqofb7gi&dl=1';
@@ -629,7 +646,7 @@
         function playSound(type) {
             if (preloadedSounds[type]) {
                 preloadedSounds[type].currentTime = 0;
-                preloadedSounds[type].play();
+                preloadedSounds[type].play().catch(e => console.error("Error playing sound:", e));
             }
         }
 
@@ -640,7 +657,7 @@
             document.body.classList.add('shake-body');
             document.querySelector('#program-screen').parentElement.querySelector('.monitor-flash').classList.add('flash');
             
-            if (points === 0) {
+            if (points <= 0) {
                 successPopup.src = ouchImageUrl;
             } else {
                 successPopup.src = successImageUrl;
@@ -662,6 +679,8 @@
         }
 
         function triggerGoalReachedAnimation() {
+            playSound('applause');
+            preloadedSounds.victoryMusic.play();
             goalText.innerHTML = `Well done! The professor was happy with the production!<br><br>Final Score: ${score}<br><br>Click anywhere to continue.`;
             goalOverlay.classList.add('show');
             goalConfettiInterval = setInterval(triggerConfetti, 500);
@@ -670,6 +689,10 @@
         function hideGoalOverlay() {
             goalOverlay.classList.remove('show');
             clearInterval(goalConfettiInterval);
+            if(preloadedSounds.victoryMusic) {
+                preloadedSounds.victoryMusic.pause();
+                preloadedSounds.victoryMusic.currentTime = 0;
+            }
         }
 
         function triggerConfetti() {
@@ -721,7 +744,7 @@
             clearInterval(goalConfettiInterval);
             dsk2Overlay.classList.remove('show');
             
-            backgroundMusic.play().catch(e => console.log("Audio play failed, user interaction needed."));
+            backgroundMusic.play().catch(e => console.log("Audio play requires user interaction to start."));
         }
 
         function endGame() {
@@ -758,6 +781,7 @@
         }
 
         function displayNewPrompt() {
+             clearInterval(promptTimerInterval);
              if (score >= GOAL_SCORE && !goalReached) {
                 goalReached = true;
                 gameStarted = false;
@@ -795,6 +819,13 @@
             
             availablePrompts = availablePrompts.filter(p => p !== currentPrompt);
             promptText.textContent = currentPrompt.text;
+            
+            promptTimerBar.style.transition = 'none';
+            promptTimerBar.style.width = '100%';
+            setTimeout(() => {
+                promptTimerBar.style.transition = `width ${TIMER_DURATION}s linear`;
+                promptTimerBar.style.width = '0%';
+            }, 20);
         }
 
         function evaluateProgramState() {
